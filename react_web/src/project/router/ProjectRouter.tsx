@@ -1,8 +1,9 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { HomePage } from "./pages/HomePage";
+import { HomePage } from "../pages";
+import { ProjectLayout } from "../layout";
 export const ProjectRouter = () => {
   return (
-    <>
+    <ProjectLayout>
       <div className="container">
         <Routes>
           <Route path="home" element={<HomePage />} />
@@ -10,6 +11,6 @@ export const ProjectRouter = () => {
           <Route path="/*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
-    </>
+    </ProjectLayout>
   );
 };

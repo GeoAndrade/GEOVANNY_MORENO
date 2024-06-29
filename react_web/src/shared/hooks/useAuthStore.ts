@@ -17,6 +17,8 @@ export const useAuthStore = () => {
       token: "token",
       expiracion: "",
       userName: loginInfo.email,
+      firstName: "Geovanny",
+      lastName: "Moreno",
     };
     await sleep(2).then(
       async () =>

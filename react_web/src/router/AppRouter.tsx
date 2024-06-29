@@ -3,7 +3,7 @@ import { AuthRouter } from "../auth/router";
 import { useLocalStorage } from "../data";
 import { useEffect, useMemo } from "react";
 import { useAuthStore } from "../shared";
-import { ProjectRouter } from "../project/ProjectRouter";
+import { ProjectRouter } from "../project/router/ProjectRouter";
 import { LoadingScreen } from "../theme";
 
 export const AppRouter = () => {

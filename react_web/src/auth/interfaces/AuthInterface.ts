@@ -4,6 +4,8 @@ export interface JWTInfo {
   token: string;
   expiracion: string;
   userName: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface AuthInfo {

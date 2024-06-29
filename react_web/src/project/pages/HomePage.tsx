@@ -1,3 +1,9 @@
+import { BasePage } from "../template";
+
 export const HomePage = () => {
-  return <div>HomePage</div>;
+  return (
+    <BasePage>
+      <h1>HomePage</h1>
+    </BasePage>
+  );
 };
