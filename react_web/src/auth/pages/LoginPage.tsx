@@ -1,8 +1,16 @@
 import { Alert, Button, Grid, TextField } from "@mui/material";
 import { AuthLayout } from "..";
 import { useForm } from "../../hooks";
+import { useAuthStore } from "../../shared";
+let user = "";
+let pass = "";
+if (process.env.NODE_ENV === "development") {
+  user = "geo@correo.com";
+  pass = "123456";
+}
 
 export const LoginPage = () => {
+  const { onLogin } = useAuthStore();
   const {
     email,
     password,
@@ -12,8 +20,8 @@ export const LoginPage = () => {
     isFormValid,
   } = useForm(
     {
-      email: "",
-      password: "",
+      email: user,
+      password: pass,
     },
     {
       email: [(value) => value.includes("@"), "Ingrese un correo válido"],
@@ -24,11 +32,9 @@ export const LoginPage = () => {
     }
   );
 
-  const onLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (!isFormValid) return;
+  const onPressLogin = async () => {
+    await onLogin({ email, password });
   };
-
   return (
     <AuthLayout title={"Login"}>
       <form>
@@ -63,15 +69,15 @@ export const LoginPage = () => {
           </Grid>
           <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
             <Grid item xs={12} display={"none"}>
-              <Alert severity="error"></Alert>
+              <Alert severity="error">hola</Alert>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button
-                disabled={false}
+                disabled={!isFormValid}
                 variant="contained"
                 fullWidth
                 type="submit"
-                onClick={onLogin}
+                onClick={onPressLogin}
               >
                 Login
               </Button>

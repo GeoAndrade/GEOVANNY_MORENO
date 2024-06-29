@@ -12,6 +12,6 @@ export interface AuthInfo {
 }
 
 export interface LoginInfo {
-  userName: string;
+  email: string;
   password: string;
 }
