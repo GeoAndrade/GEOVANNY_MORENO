@@ -1,5 +1,10 @@
-import { Typography } from "@mui/material";
+import { AppTheme } from "./theme";
+import { AppRouter } from "./router";
 
 export const App = () => {
-  return <h1>App</h1>;
+  return (
+    <AppTheme>
+      <AppRouter />
+    </AppTheme>
+  );
 };

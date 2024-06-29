@@ -3,11 +3,12 @@ import ReactDOM from "react-dom/client";
 import "./styles.css";
 import { App } from "./App";
 import { AppTheme } from "./theme";
+import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <AppTheme>
+    <BrowserRouter>
       <App />
-    </AppTheme>
+    </BrowserRouter>
   </React.StrictMode>
 );
