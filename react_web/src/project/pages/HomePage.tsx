@@ -1,4 +1,3 @@
-import { useState, ChangeEvent } from "react";
 import { BasePage } from "../template";
 import {
   Box,
@@ -8,25 +7,25 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
+import { useUserTaskStore } from "../../shared";
+import { useEffect, useState } from "react";
+import { UserTask } from "../interfaces";
 
-interface UserTask {
-  name: string;
-  description: string;
-  assignedTo: string;
-}
-
-const tasksExample = [
+const tasksExample: UserTask[] = [
   {
+    idUserTask: 1,
     name: "Comprar víveres",
     description: "Comprar leche, pan y huevos",
     assignedTo: "Juan",
   },
   {
+    idUserTask: 2,
     name: "Reunión de equipo",
     description: "Discutir el progreso del proyecto",
     assignedTo: "María",
   },
   {
+    idUserTask: 3,
     name: "Pasear al perro",
     description: "Llevar a Rocky al parque",
     assignedTo: "Carlos",
@@ -34,46 +33,54 @@ const tasksExample = [
 ];
 
 export const HomePage = () => {
-  const [tasks, setTasks] = useState<UserTask[]>(tasksExample);
-  const [currentTask, setCurrentTask] = useState<UserTask>({
-    name: "",
-    description: "",
-    assignedTo: "",
-  });
+  const {
+    userTasks,
+    activeUserTask,
+    onSetActiveUserTask,
+    onResetUserTask,
+    onSetUserTasks,
+    onDeleteUserTask,
+    onUpdateUserTask,
+    onAddNewUserTask,
+  } = useUserTaskStore();
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCurrentTask({ ...currentTask, [name]: value });
+  const onUpdateActiveUserTask = (field: string, value: string) => {
+    onSetActiveUserTask({ ...activeUserTask, [field]: value });
   };
 
-  const onPressAddTask = () => {
-    setTasks([...tasks, currentTask]);
-    setCurrentTask({ name: "", description: "", assignedTo: "" });
-  };
-
-  const onPressEditTask = (index: number) => {
-    setCurrentTask(tasks[index]);
+  const onPressEditTask = (task: UserTask) => {
+    onSetActiveUserTask(task);
     setIsEditing(true);
-    setEditingIndex(index);
   };
 
-  const onPressDeleteTask = (index: number) => {
-    setTasks(tasks.filter((_, i) => i !== index));
+  const onPressDeleteTask = (task: UserTask) => {
+    onDeleteUserTask(task);
+    setIsEditing(false);
   };
 
-  const onPressSaveEdit = () => {
-    if (editingIndex !== null) {
-      const updatedTasks = tasks.map((task, index) =>
-        index === editingIndex ? currentTask : task
-      );
-      setTasks(updatedTasks);
-      setCurrentTask({ name: "", description: "", assignedTo: "" });
-      setIsEditing(false);
-      setEditingIndex(null);
-    }
+  const onPressNewUserTask = () => {
+    onResetUserTask();
+    setIsEditing(false);
   };
+
+  const onPressUpdateUserTask = () => {
+    onUpdateUserTask({
+      ...activeUserTask,
+      idUserTask: activeUserTask.idUserTask,
+    });
+
+    setIsEditing(false);
+  };
+
+  const onPressAddNewUserTask = () => {
+    onAddNewUserTask({ ...activeUserTask, idUserTask: new Date().getTime() });
+  };
+
+  useEffect(() => {
+    onSetUserTasks(tasksExample);
+  }, []);
 
   return (
     <BasePage>
@@ -102,22 +109,28 @@ export const HomePage = () => {
           <TextField
             label="Nombre de la tarea"
             name="name"
-            value={currentTask.name}
-            onChange={onInputChange}
+            value={activeUserTask?.name || ""}
+            onChange={(e) =>
+              onUpdateActiveUserTask(e.target.name, e.target.value)
+            }
             fullWidth
           />
           <TextField
             label="Descripción de la tarea"
             name="description"
-            value={currentTask.description}
-            onChange={onInputChange}
+            value={activeUserTask?.description || ""}
+            onChange={(e) =>
+              onUpdateActiveUserTask(e.target.name, e.target.value)
+            }
             fullWidth
           />
           <TextField
             label="Asignado a"
             name="assignedTo"
-            value={currentTask.assignedTo}
-            onChange={onInputChange}
+            value={activeUserTask?.assignedTo || ""}
+            onChange={(e) =>
+              onUpdateActiveUserTask(e.target.name, e.target.value)
+            }
             fullWidth
           />
           <Box
@@ -130,7 +143,9 @@ export const HomePage = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={isEditing ? onPressSaveEdit : onPressAddTask}
+              onClick={
+                isEditing ? onPressUpdateUserTask : onPressAddNewUserTask
+              }
             >
               {isEditing ? "Actualizar Tarea" : "Guardar Tarea"}
             </Button>
@@ -138,11 +153,7 @@ export const HomePage = () => {
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => {
-                  setIsEditing(false);
-                  setCurrentTask({ name: "", description: "", assignedTo: "" });
-                  setEditingIndex(null);
-                }}
+                onClick={onPressNewUserTask}
               >
                 Nueva Tarea
               </Button>
@@ -160,38 +171,42 @@ export const HomePage = () => {
           <Typography variant="h4" gutterBottom>
             Mis Tareas
           </Typography>
-          {tasks.map((task, index) => (
-            <Card key={index} sx={{ marginBottom: "16px" }}>
-              <CardContent>
-                <Typography variant="h5">{task.name}</Typography>
-                <Typography variant="body2">{task.description}</Typography>
-                <Typography variant="body2">
-                  Asignado a: {task.assignedTo}
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "8px",
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    onClick={() => onPressEditTask(index)}
+          {userTasks.length > 0 ? (
+            userTasks.map((task) => (
+              <Card key={task.idUserTask} sx={{ marginBottom: "16px" }}>
+                <CardContent>
+                  <Typography variant="h5">{task.name}</Typography>
+                  <Typography variant="body2">{task.description}</Typography>
+                  <Typography variant="body2">
+                    Asignado a: {task.assignedTo}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      gap: "8px",
+                    }}
                   >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => onPressDeleteTask(index)}
-                  >
-                    Eliminar
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+                    <Button
+                      variant="outlined"
+                      onClick={() => onPressEditTask(task)}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => onPressDeleteTask(task)}
+                    >
+                      Eliminar
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Typography variant="body1">No hay tareas registradas.</Typography>
+          )}
         </Box>
       </Box>
     </BasePage>
