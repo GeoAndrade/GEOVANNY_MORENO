@@ -172,9 +172,9 @@ export const HomePage = () => {
             label="Fecha de vencimiento"
             name="dueDate"
             value={
-              activeUserTask?.dueDate
+              activeUserTask?.dueDate instanceof Date
                 ? activeUserTask.dueDate.toISOString().split("T")[0]
-                : ""
+                : activeUserTask?.dueDate || ""
             }
             onChange={(e) =>
               onUpdateActiveUserTask(e.target.name, e.target.value)
