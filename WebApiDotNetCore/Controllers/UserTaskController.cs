@@ -67,8 +67,8 @@ namespace WebApiDotNetCore.Controllers
         HTTPHelper.CustomHTTPResponse(HttpCode.OK, await service.UpdateUserTaskAsync(userTaskDto));
               
         [HttpDelete]
-        public async Task<ActionResult> DeleteUserTask(long id) =>
-            HTTPHelper.CustomHTTPResponse(HttpCode.NoContent, await service.DeleteUserTaskAsync(id));
+        public async Task<ActionResult> DeleteUserTask(UserTaskDTO userTaskDto) =>
+            HTTPHelper.CustomHTTPResponse(HttpCode.OK, await service.DeleteUserTaskAsync(userTaskDto));
         
         
     }

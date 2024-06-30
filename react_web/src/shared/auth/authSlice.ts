@@ -7,8 +7,6 @@ const initialState: AuthInfo = {
     token: "",
     expiracion: "",
     userName: "",
-    firstName: "",
-    lastName: "",
   },
 };
 

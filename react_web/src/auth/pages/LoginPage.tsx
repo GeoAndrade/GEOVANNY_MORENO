@@ -11,20 +11,21 @@ if (process.env.NODE_ENV === "development") {
 
 export const LoginPage = () => {
   const { onLogin } = useAuthStore();
+
   const {
-    email,
+    username,
     password,
     onInputChange,
-    emailValid,
+    usernameValid,
     passwordValid,
     isFormValid,
   } = useForm(
     {
-      email: user,
+      username: user,
       password: pass,
     },
     {
-      email: [(value) => value.includes("@"), "Ingrese un correo válido"],
+      username: [(value) => value.includes("@"), "Ingrese un correo válido"],
       password: [
         (value) => value.length >= 6,
         "El password debe tener más de 6 letras.",
@@ -33,7 +34,7 @@ export const LoginPage = () => {
   );
 
   const onPressLogin = async () => {
-    await onLogin({ email, password });
+    await onLogin({ username, password });
   };
   return (
     <AuthLayout title={"Login"}>
@@ -46,11 +47,11 @@ export const LoginPage = () => {
               type="email"
               placeholder="geo@correp.com"
               fullWidth
-              name="email"
-              value={email}
+              name="username"
+              value={username}
               onChange={onInputChange}
-              error={!!emailValid}
-              helperText={emailValid}
+              error={!!usernameValid}
+              helperText={usernameValid}
             />
           </Grid>
           <Grid item xs={12} sx={{ mt: 2 }}>

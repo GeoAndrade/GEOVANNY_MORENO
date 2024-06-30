@@ -14,10 +14,12 @@ namespace WebApiDotNetCore.Services
         private string ip = ip;
         private readonly MapperHelper mapperHelper = mapperHelper;
 
-        public async Task<IEnumerable<UserTask>> GetUserTasksAsync() => 
-             await context.UserTasks
+        public async Task<List<UserTaskDTO>> GetUserTasksAsync() => 
+              mapperHelper.GetMappedList<UserTask, UserTaskDTO>(await context.UserTasks
                 .Where(ut => ut.User.UserName == userInfo.UserName && ut.Active)
-                .ToListAsync();
+                .ToListAsync(), x=> true)
+
+           ;
 
         public async Task<UserTaskDTO> CreateUserTaskAsync(UserTaskDTO userTaskDto)
         {
@@ -36,8 +38,7 @@ namespace WebApiDotNetCore.Services
 
         public async Task<UserTaskDTO> UpdateUserTaskAsync( UserTaskDTO userTaskDto)
         {
-            var userTask = await context.UserTasks.FindAsync(userTaskDto.IdUserTask);
-            if (userTask == null)
+            var userTask = await context.UserTasks.FirstOrDefaultAsync(x => x.IdUserTask == userTaskDto.IdUserTask) ?? 
                 throw new Exception("Ocurrio un error al actualizar la tarea");
             userTask.Name = userTaskDto.Name;
             userTask.Description = userTaskDto.Description;
@@ -46,9 +47,9 @@ namespace WebApiDotNetCore.Services
             return mapperHelper.GetMappedObject<UserTask, UserTaskDTO>(userTask); ;
         }
 
-        public async Task<string> DeleteUserTaskAsync(long id)
+        public async Task<string> DeleteUserTaskAsync(UserTaskDTO userTaskDto)
         {
-            var userTask = await context.UserTasks.FindAsync(id);
+            var userTask = await context.UserTasks.FindAsync(userTaskDto.IdUserTask);
             if (userTask == null || userTask.User.UserName != userInfo.UserName)
                 throw new Exception("Ocurrio un error al eliminar la tarea");
             userTask.Active = false;

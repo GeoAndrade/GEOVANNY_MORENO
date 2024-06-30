@@ -1,30 +1,17 @@
 import { BasePage } from "../template";
-import { Box, TextField, Button, Typography } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { useUserTaskStore } from "../../shared";
 import { useEffect, useState } from "react";
 import { UserTask } from "../interfaces";
-import { UserTaskItem } from "../components/UserTaskItem";
-
-const tasksExample: UserTask[] = [
-  {
-    idUserTask: 1,
-    name: "Comprar víveres",
-    description: "Comprar leche, pan y huevos",
-    assignedTo: "Juan",
-  },
-  {
-    idUserTask: 2,
-    name: "Reunión de equipo",
-    description: "Discutir el progreso del proyecto",
-    assignedTo: "María",
-  },
-  {
-    idUserTask: 3,
-    name: "Pasear al perro",
-    description: "Llevar a Rocky al parque",
-    assignedTo: "Carlos",
-  },
-];
+import { UserTaskItem } from "../components";
+import { userTaskController } from "../../services";
+import Swal from "sweetalert2";
 
 export const HomePage = () => {
   const {
@@ -40,6 +27,15 @@ export const HomePage = () => {
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
+  const [fetchGetUserTasks, { isLoading: isLoadingUserTasks }] =
+    userTaskController.useLazyGetUserTasksQuery();
+  const [fetchPostUserTask, { isLoading: isLoadingNewUserTask }] =
+    userTaskController.usePostCreateTaskMutation();
+  const [fetchPatchUserTask, { isLoading: isLoadingUpdateUserTask }] =
+    userTaskController.usePatchUserTaskMutation();
+  const [fetchDeleteUserTask, { isLoading: isLoadingDeleteUserTask }] =
+    userTaskController.useDeleteUserTaskMutation();
+
   const onUpdateActiveUserTask = (field: string, value: string) => {
     onSetActiveUserTask({ ...activeUserTask, [field]: value });
   };
@@ -49,35 +45,71 @@ export const HomePage = () => {
     setIsEditing(true);
   };
 
-  const onPressDeleteTask = (task: UserTask) => {
-    onDeleteUserTask(task);
-    setIsEditing(false);
-  };
+  const onPressDeleteTask = async (task: UserTask) =>
+    await fetchDeleteUserTask(task)
+      .unwrap()
+      .then(() => {
+        onDeleteUserTask(task);
+      })
+      .catch((error) => {
+        Swal.fire(
+          "Error al eliminar tarea",
+          JSON.stringify(error, null, 3),
+          "error"
+        );
+      })
+      .finally(() => setIsEditing(false));
 
   const onPressNewUserTask = () => {
     onResetUserTask();
     setIsEditing(false);
   };
 
-  const onPressUpdateUserTask = () => {
-    onUpdateUserTask({
-      ...activeUserTask,
-      idUserTask: activeUserTask.idUserTask,
-    });
+  const onPressUpdateUserTask = async () =>
+    await fetchPatchUserTask(activeUserTask)
+      .unwrap()
+      .then(onUpdateUserTask)
+      .then(onLoadAllUserTasks)
+      .catch((error) => {
+        Swal.fire(
+          "Error al actualizar tarea",
+          JSON.stringify(error, null, 3),
+          "error"
+        );
+      })
+      .finally(() => setIsEditing(false));
 
-    setIsEditing(false);
-  };
+  const onPressAddNewUserTask = async () =>
+    await fetchPostUserTask(activeUserTask)
+      .unwrap()
+      .then(onAddNewUserTask)
+      .then(onLoadAllUserTasks)
+      .catch((error) => {
+        Swal.fire(
+          "Error al agregar tarea",
+          JSON.stringify(error, null, 3),
+          "error"
+        );
+      });
 
-  const onPressAddNewUserTask = () => {
-    onAddNewUserTask({ ...activeUserTask, idUserTask: new Date().getTime() });
-  };
+  const onLoadAllUserTasks = async () =>
+    await fetchGetUserTasks()
+      .unwrap()
+      .then(onSetUserTasks)
+      .catch((error) => {
+        Swal.fire("Error", JSON.stringify(error, null, 3), "error");
+      });
 
   const validForm = () =>
-    activeUserTask.name.length > 3 && activeUserTask.assignedTo.length > 3;
+    activeUserTask.name.length > 3 && activeUserTask.responsible.length > 3;
 
   useEffect(() => {
-    onSetUserTasks(tasksExample);
+    onLoadAllUserTasks();
   }, []);
+
+  useEffect(() => {
+    console.log({ activeUserTask });
+  }, [activeUserTask]);
 
   return (
     <BasePage>
@@ -123,8 +155,8 @@ export const HomePage = () => {
           />
           <TextField
             label="Asignado a"
-            name="assignedTo"
-            value={activeUserTask?.assignedTo || ""}
+            name="responsible"
+            value={activeUserTask?.responsible || ""}
             onChange={(e) =>
               onUpdateActiveUserTask(e.target.name, e.target.value)
             }
@@ -137,24 +169,32 @@ export const HomePage = () => {
               width: "100%",
             }}
           >
-            <Button
-              disabled={!validForm()}
-              variant="contained"
-              color="primary"
-              onClick={
-                isEditing ? onPressUpdateUserTask : onPressAddNewUserTask
-              }
-            >
-              {isEditing ? "Actualizar Tarea" : "Guardar Tarea"}
-            </Button>
-            {isEditing && (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={onPressNewUserTask}
-              >
-                Nueva Tarea
-              </Button>
+            {isLoadingNewUserTask ||
+            isLoadingUpdateUserTask ||
+            isLoadingDeleteUserTask ? (
+              <CircularProgress color="warning" />
+            ) : (
+              <>
+                <Button
+                  disabled={!validForm()}
+                  variant="contained"
+                  color="primary"
+                  onClick={
+                    isEditing ? onPressUpdateUserTask : onPressAddNewUserTask
+                  }
+                >
+                  {isEditing ? "Actualizar Tarea" : "Guardar Tarea"}
+                </Button>
+                {isEditing && (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={onPressNewUserTask}
+                  >
+                    Nueva Tarea
+                  </Button>
+                )}
+              </>
             )}
           </Box>
         </Box>
@@ -166,20 +206,28 @@ export const HomePage = () => {
             padding: "16px",
           }}
         >
-          <Typography variant="h4" gutterBottom>
-            Mis Tareas
-          </Typography>
-          {userTasks.length > 0 ? (
-            userTasks.map((task) => (
-              <UserTaskItem
-                key={task.idUserTask}
-                task={task}
-                onPressEditTask={onPressEditTask}
-                onPressDeleteTask={onPressDeleteTask}
-              />
-            ))
+          {isLoadingUserTasks ? (
+            <CircularProgress color="warning" />
           ) : (
-            <Typography variant="body1">No hay tareas registradas.</Typography>
+            <>
+              <Typography variant="h4" gutterBottom>
+                Mis Tareas
+              </Typography>
+              {userTasks.length > 0 ? (
+                userTasks.map((task) => (
+                  <UserTaskItem
+                    key={task.idUserTask}
+                    task={task}
+                    onPressEditTask={onPressEditTask}
+                    onPressDeleteTask={onPressDeleteTask}
+                  />
+                ))
+              ) : (
+                <Typography variant="body1">
+                  No hay tareas registradas.
+                </Typography>
+              )}
+            </>
           )}
         </Box>
       </Box>

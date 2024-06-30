@@ -10,7 +10,7 @@ const initialUserTask: UserTask = {
   idUserTask: 0,
   name: "",
   description: "",
-  assignedTo: "",
+  responsible: "",
 };
 
 const initialState: userTaskStore = {

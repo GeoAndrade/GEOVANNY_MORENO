@@ -1,6 +1,7 @@
-import { configureStore } from "@reduxjs/toolkit";
 import { authSlice } from "./auth";
 import { userTaskSlice } from "./userTask";
+import { authController, userTaskController } from "../services";
+import { configureStore } from "@reduxjs/toolkit";
 
 export const store = configureStore({
   reducer: {
@@ -8,15 +9,18 @@ export const store = configureStore({
     auth: authSlice.reducer,
     //*UserTask
     userTask: userTaskSlice.reducer,
+    //*Api
+    [authController.reducerPath]: authController.reducer,
+    [userTaskController.reducerPath]: userTaskController.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }),
+    })
+      .concat(authController.middleware)
+      .concat(userTaskController.middleware),
 });
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;

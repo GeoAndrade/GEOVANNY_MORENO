@@ -16,7 +16,7 @@ export const UserTaskItem = ({
       <CardContent>
         <Typography variant="h5">{task.name}</Typography>
         <Typography variant="body2">{task.description}</Typography>
-        <Typography variant="body2">Asignado a: {task.assignedTo}</Typography>
+        <Typography variant="body2">Asignado a: {task.responsible}</Typography>
         <Box
           sx={{
             display: "flex",

@@ -1,29 +1,30 @@
-import { JWTInfo, LoginInfo, useAuthStorage } from "../../auth";
+import { LoginInfo, useAuthStorage } from "../../auth";
 import { sleep } from "../../helpers";
-
+import { authController } from "../../services";
 import { checking, login, logout } from "../auth";
 import { useAppStore } from "./useAppStore";
+import Swal from "sweetalert2";
 
 export const useAuthStore = () => {
   const { SaveJWTInfo, GetJWTInfo, CheckJWTInfo, DeleteJWTInfo } =
     useAuthStorage();
+  const [fetchLogin] = authController.usePostLoginMutation();
   const {
     auth: { status, jwtInfo },
     dispatch,
   } = useAppStore();
   const onLogin = async (loginInfo: LoginInfo) => {
     dispatch(checking());
-    const userInfo: JWTInfo = {
-      token: "token",
-      expiracion: "",
-      userName: loginInfo.email,
-      firstName: "Geovanny",
-      lastName: "Moreno",
-    };
-    await sleep(2).then(
-      async () =>
-        await SaveJWTInfo(userInfo).then(() => dispatch(login(userInfo)))
-    );
+    await fetchLogin(loginInfo)
+      .unwrap()
+      .then(
+        async (jwtInfo) =>
+          await SaveJWTInfo(jwtInfo).then(() => dispatch(login(jwtInfo)))
+      )
+      .catch((error) => {
+        Swal.fire("Error", error.data, "error");
+        dispatch(logout());
+      });
     return;
   };
 

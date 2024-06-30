@@ -12,7 +12,7 @@ import { useAuthStore } from "../../shared";
 
 export const NavBar = () => {
   const {
-    jwtInfo: { firstName, lastName },
+    jwtInfo: { userName },
     onLogOut,
   } = useAuthStore();
 
@@ -47,10 +47,10 @@ export const NavBar = () => {
               }}
             >
               <Avatar sx={{ bgcolor: "primary.main", color: "white", mr: 1 }}>
-                {firstName.charAt(0)}
+                {userName.charAt(0)}
               </Avatar>
               <Typography variant="h6" noWrap component={"div"}>
-                {`${firstName} ${lastName}`}
+                {`${userName}`}
               </Typography>
             </Box>
           </Box>
