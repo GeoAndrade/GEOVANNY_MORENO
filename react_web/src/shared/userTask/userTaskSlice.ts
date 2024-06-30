@@ -10,7 +10,8 @@ const initialUserTask: UserTask = {
   idUserTask: 0,
   name: "",
   description: "",
-  responsible: "",
+  dueDate: new Date(),
+  completed: false,
 };
 
 const initialState: userTaskStore = {

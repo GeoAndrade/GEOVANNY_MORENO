@@ -19,8 +19,8 @@ namespace WebApiDotNetCore.Test.Tests
             //Datos
             var userTasks = new List<UserTask>
             {
-                new() { IdUserTask = 1, Name = "Test Task 1", Description = "Description 1", Responsible = "Responsible 1", IdUser = user.Id, Active = true },
-                new() { IdUserTask = 2, Name = "Test Task 2", Description = "Description 2", Responsible = "Responsible 2", IdUser = user.Id, Active = true }
+                new() { IdUserTask = 1, Name = "Test Task 1", Description = "Description 1", DueDate = DateTime.Now.AddDays(5), IdUser = user.Id, Completed = false, Active = true },
+                new() { IdUserTask = 2, Name = "Test Task 2", Description = "Description 2", DueDate = DateTime.Now.AddDays(5), IdUser = user.Id,Completed = false, Active = true }
             };
             //Guardado en db In memory
             await context.UserTasks.AddRangeAsync(userTasks);

@@ -45,6 +45,20 @@ export const HomePage = () => {
     setIsEditing(true);
   };
 
+  const onPressCompletedTask = async (task: UserTask) =>
+    await fetchPatchUserTask({ ...task, completed: true })
+      .unwrap()
+      .then(onUpdateUserTask)
+      .then(onLoadAllUserTasks)
+      .catch((error) => {
+        Swal.fire(
+          "Error al completar tarea",
+          JSON.stringify(error, null, 3),
+          "error"
+        );
+      })
+      .finally(() => setIsEditing(false));
+
   const onPressDeleteTask = async (task: UserTask) =>
     await fetchDeleteUserTask(task)
       .unwrap()
@@ -101,7 +115,7 @@ export const HomePage = () => {
       });
 
   const validForm = () =>
-    activeUserTask.name.length > 3 && activeUserTask.responsible.length > 3;
+    activeUserTask.name.length > 3 && activeUserTask.description.length > 3;
 
   useEffect(() => {
     onLoadAllUserTasks();
@@ -154,13 +168,21 @@ export const HomePage = () => {
             fullWidth
           />
           <TextField
-            label="Asignado a"
-            name="responsible"
-            value={activeUserTask?.responsible || ""}
+            type="date"
+            label="Fecha de vencimiento"
+            name="dueDate"
+            value={
+              activeUserTask?.dueDate
+                ? activeUserTask.dueDate.toISOString().split("T")[0]
+                : ""
+            }
             onChange={(e) =>
               onUpdateActiveUserTask(e.target.name, e.target.value)
             }
             fullWidth
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
           <Box
             sx={{
@@ -220,6 +242,7 @@ export const HomePage = () => {
                     task={task}
                     onPressEditTask={onPressEditTask}
                     onPressDeleteTask={onPressDeleteTask}
+                    onPressCompletedTask={onPressCompletedTask}
                   />
                 ))
               ) : (

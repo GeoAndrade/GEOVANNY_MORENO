@@ -28,7 +28,8 @@ namespace WebApiDotNetCore.Services
             {
                 Name = userTaskDto.Name,
                 Description = userTaskDto.Description,
-                Responsible = userTaskDto.Responsible,
+                DueDate = userTaskDto.DueDate,
+                Completed = userTaskDto.Completed,
                 IdUser = _userInfo.Id,
                 Active = true,
             };
@@ -47,10 +48,9 @@ namespace WebApiDotNetCore.Services
 
             userTask.Name = userTaskDto.Name;
             userTask.Description = userTaskDto.Description;
-            userTask.Responsible = userTaskDto.Responsible;
-
+            userTask.DueDate = userTaskDto.DueDate;
+            userTask.Completed = userTaskDto.Completed;
             await _context.SaveChangesAsync();
-
             return _mapper.Map<UserTaskDTO>(userTask);
         }
 
@@ -59,7 +59,6 @@ namespace WebApiDotNetCore.Services
             var userTask = await _context.UserTasks.FindAsync(userTaskDto.IdUserTask);
             if (userTask == null || userTask.User.UserName != _userInfo.UserName)
                 throw new Exception("Ocurrió un error al eliminar la tarea");
-
             userTask.Active = false;
             await _context.SaveChangesAsync();
 
