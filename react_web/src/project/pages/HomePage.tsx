@@ -72,6 +72,9 @@ export const HomePage = () => {
     onAddNewUserTask({ ...activeUserTask, idUserTask: new Date().getTime() });
   };
 
+  const validForm = () =>
+    activeUserTask.name.length > 3 && activeUserTask.assignedTo.length > 3;
+
   useEffect(() => {
     onSetUserTasks(tasksExample);
   }, []);
@@ -135,6 +138,7 @@ export const HomePage = () => {
             }}
           >
             <Button
+              disabled={!validForm()}
               variant="contained"
               color="primary"
               onClick={
