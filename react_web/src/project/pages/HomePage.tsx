@@ -1,15 +1,9 @@
 import { BasePage } from "../template";
-import {
-  Box,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { Box, TextField, Button, Typography } from "@mui/material";
 import { useUserTaskStore } from "../../shared";
 import { useEffect, useState } from "react";
 import { UserTask } from "../interfaces";
+import { UserTaskItem } from "../components/UserTaskItem";
 
 const tasksExample: UserTask[] = [
   {
@@ -173,36 +167,12 @@ export const HomePage = () => {
           </Typography>
           {userTasks.length > 0 ? (
             userTasks.map((task) => (
-              <Card key={task.idUserTask} sx={{ marginBottom: "16px" }}>
-                <CardContent>
-                  <Typography variant="h5">{task.name}</Typography>
-                  <Typography variant="body2">{task.description}</Typography>
-                  <Typography variant="body2">
-                    Asignado a: {task.assignedTo}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      gap: "8px",
-                    }}
-                  >
-                    <Button
-                      variant="outlined"
-                      onClick={() => onPressEditTask(task)}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => onPressDeleteTask(task)}
-                    >
-                      Eliminar
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
+              <UserTaskItem
+                key={task.idUserTask}
+                task={task}
+                onPressEditTask={onPressEditTask}
+                onPressDeleteTask={onPressDeleteTask}
+              />
             ))
           ) : (
             <Typography variant="body1">No hay tareas registradas.</Typography>

@@ -3,3 +3,4 @@ export * from "./pages";
 export * from "./router";
 export * from "./template";
 export * from "./interfaces";
+export * from "./components";
