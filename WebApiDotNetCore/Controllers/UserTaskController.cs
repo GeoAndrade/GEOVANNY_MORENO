@@ -31,27 +31,26 @@ namespace WebApiDotNetCore.Controllers
         private readonly UserManager<User> userManager;
         private static readonly HttpClient client = new HttpClient();
         protected UserTaskService service;
-        private readonly MapperHelper mapperHelper;
 
         public UserTaskController(IConfiguration configuration,
                                   IAuthorizationService authorizationService,
                                   UserManager<User> userManager,
                                   IHttpContextAccessor httpContextAccessor,
                                   ApplicationDbContext context,
-                                  MapperHelper mapperHelper)
+                                  IMapper mapper)
         {
             this.authorizationService = authorizationService;
             this.configuration = configuration;
             this.userManager = userManager;
             this.httpContextAccessor = httpContextAccessor;
             this.context = context;
-            this.mapperHelper = mapperHelper;
+            this.mapper = mapper;
             User userInfo = Task.Run(async () =>
            (await userManager.FindByNameAsync(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c =>
            c.Type.Contains("email", StringComparison.CurrentCultureIgnoreCase))?.Value ?? ""))).Result;
 
             var ip = httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString();
-            this.service = new UserTaskService(userInfo, ip, mapperHelper, context);
+            this.service = new UserTaskService(userInfo, ip, mapper, context);
         }
 
         [HttpGet]

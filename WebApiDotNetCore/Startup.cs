@@ -114,7 +114,6 @@ namespace WebApiDotNetCore
                 c.IncludeXmlComments(rutaXML);
             });
             services.AddAutoMapper(typeof(Startup));
-            services.AddScoped<MapperHelper>();
             services.AddDataProtection();
 
             services.AddTransient<HashService>();

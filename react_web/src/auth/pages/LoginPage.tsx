@@ -5,8 +5,8 @@ import { useAuthStore } from "../../shared";
 let user = "";
 let pass = "";
 if (process.env.NODE_ENV === "development") {
-  user = "geo@correo.com";
-  pass = "123456";
+  user = "admin@email.com";
+  pass = "Abc123*+";
 }
 
 export const LoginPage = () => {
