@@ -40,7 +40,10 @@ namespace WebApiDotNetCore.Controllers
 
         [HttpPost("Register")]
         public async Task<ActionResult<AuthenticationResponse>> Registrar(RegisterInfo registerInfo) =>
-            (await userManager.CreateAsync(new User { UserName = registerInfo.Username, Email = registerInfo.Email }, registerInfo.Password)).Succeeded ?
+            (await userManager.CreateAsync(new User { 
+                UserName = registerInfo.Username, 
+                Email = registerInfo.Email 
+            }, registerInfo.Password)).Succeeded ?
             await CreateToken(registerInfo.Username) :
             BadRequest("Ocurrio un error al registrar usuario");
 

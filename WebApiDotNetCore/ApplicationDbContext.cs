@@ -27,6 +27,7 @@ namespace WebApiDotNetCore
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogin", "SEG");
         }
 
-       
+        public DbSet<UserTask> UserTasks { get; set; }
+
     }
 }

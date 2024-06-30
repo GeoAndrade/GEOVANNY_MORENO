@@ -169,9 +169,9 @@ namespace WebApiDotNetCore
             {
                 endpoints.MapControllers();
             });
-            //using var scope = app.ApplicationServices.CreateScope();
-            //var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            //DbInitializer.InitializeAsync(userManager).Wait();
+            using var scope = app.ApplicationServices.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            DbInitializer.InitializeAsync(userManager).Wait();
         }
     }
 }

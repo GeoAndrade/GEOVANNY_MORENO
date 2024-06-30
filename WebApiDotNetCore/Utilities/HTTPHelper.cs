@@ -98,5 +98,6 @@ namespace WebApiDotNetCore.Utilities
                 StatusCode = (int)status
             };
         }
+       
     }
 }

@@ -10,6 +10,8 @@ namespace WebApiDotNetCore.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public bool Active { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<UserTask> Tasks { get; set; }
 
     }
 }
