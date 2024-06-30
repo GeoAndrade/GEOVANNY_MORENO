@@ -141,7 +141,7 @@ namespace WebApiDotNetCore
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public  void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             app.UseMiddleware<LogHTTPResponseMiddleware>();
             app.UseLoggerResponseHTTP();
@@ -169,8 +169,20 @@ namespace WebApiDotNetCore
                 endpoints.MapControllers();
             });
             using var scope = app.ApplicationServices.CreateScope();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            DbInitializer.InitializeAsync(userManager).Wait();
+            var services = scope.ServiceProvider;
+            var dbContext = services.GetRequiredService<ApplicationDbContext>();
+            try
+            {
+                dbContext.Database.EnsureCreated();
+                dbContext.Database.Migrate();
+                var userManager = services.GetRequiredService<UserManager<User>>();
+                DbInitializer.InitializeAsync(userManager).Wait();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error durante la inicialización de la base de datos: {ex}");
+                throw; 
+            }
         }
     }
 }
