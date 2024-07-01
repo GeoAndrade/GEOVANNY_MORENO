@@ -1,3 +1,4 @@
+import { UserTask } from "../src/project";
 import {
   setUserTasks,
   userTaskSlice,
@@ -10,23 +11,26 @@ describe("userTaskReducer", () => {
       activeUserTask: {
         idUserTask: 0,
         name: "",
+        dueDate: new Date(),
+        completed: false,
         description: "",
-        responsible: "",
       },
     };
 
-    const userTasks = [
+    const userTasks: UserTask[] = [
       {
         idUserTask: 1,
         name: "Task 1",
         description: "Description 1",
-        responsible: "Responsible 1",
+        dueDate: new Date(),
+        completed: false,
       },
       {
         idUserTask: 2,
         name: "Task 2",
         description: "Description 2",
-        responsible: "Responsible 2",
+        dueDate: new Date(),
+        completed: false,
       },
     ];
 
